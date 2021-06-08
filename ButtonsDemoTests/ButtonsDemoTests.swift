@@ -10,24 +10,41 @@ import XCTest
 
 class ButtonsDemoTests: XCTestCase {
 
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
+    func test_increaseButtonClick_IncreasesCounter() {
+        let sut = makeSut()
+        sut.loadViewIfNeeded()
+        
+        XCTAssertEqual(sut.counter, 0)
+        sut.increaseButton.simulateTap()
+        
+        XCTAssertEqual(sut.counter, 1)
     }
-
-    override func tearDownWithError() throws {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
+    
+    // MARK: Helpers
+    
+    func makeSut() -> ViewController {
+        let bundle = Bundle(for: ViewController.self)
+        let storyboard = UIStoryboard(name: "Main", bundle: bundle)
+        let vc = storyboard.instantiateInitialViewController() as! ViewController
+        return vc
     }
+}
 
-    func testExample() throws {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+extension UIButton {
+    func simulateTap() {
+        sendActions(for: .touchUpInside)
+//        simulate(event: .touchUpInside)
     }
+}
 
-    func testPerformanceExample() throws {
-        // This is an example of a performance test case.
-        self.measure {
-            // Put the code you want to measure the time of here.
+extension UIControl {
+    func simulate(event: UIControl.Event) {
+        allTargets.forEach { target in
+            actions(forTarget: target, forControlEvent: event)?.forEach { action in
+                let object = target as NSObject
+                let selector = Selector(action)
+                object.perform(selector)
+            }
         }
     }
-
 }
